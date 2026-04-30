@@ -74,16 +74,15 @@
     let isDetected = false;
 
     function handleDetection(detectState) {
+      const score = detectState.detectScore.toFixed(3);
       const detected = detectState.label === 'HOODED_FIGURE' && detectState.detectScore > 0.3;
 
       if (detected) {
-        if (!isDetected) {
-          isDetected    = true;
-          cube.visible  = true;
-          edges.visible = true;
-          statusEl.textContent = 'Sculpture detected';
-          statusEl.classList.add('detected');
-        }
+        isDetected    = true;
+        cube.visible  = true;
+        edges.visible = true;
+        statusEl.textContent = 'Detected — score: ' + score;
+        statusEl.classList.add('detected');
         const ps = detectState.positionScale;
         if (ps) {
           pivot.position.x = (ps[0] - 0.5) * 2;
@@ -96,9 +95,9 @@
           isDetected    = false;
           cube.visible  = false;
           edges.visible = false;
-          statusEl.textContent = 'Point camera at sculpture';
           statusEl.classList.remove('detected');
         }
+        statusEl.textContent = 'Scanning... score: ' + score;
       }
     }
 
@@ -107,7 +106,7 @@
     function renderLoop() {
       requestAnimationFrame(renderLoop);
       const detectState = WEBARROCKSOBJECT.detect(3, null, {
-        thresholdDetectFactor: 0.5,
+        thresholdDetectFactor: 0.3,
         isSkipConfirmation: true,
         isKeepTracking: true
       });
@@ -135,7 +134,7 @@
           console.log('WebARRocksObject ready — loading neural network...');
           statusEl.textContent = 'Loading neural network...';
 
-          WEBARROCKSOBJECT.set_NN('Hooded_Figure.json', function(errCodeNN) {
+          WEBARROCKSOBJECT.set_NN('https://pub-946539bb1eca40459cd9299d9f2c8bf9.r2.dev/Hooded_Figure.json', function(errCodeNN) {
             if (errCodeNN) {
               console.error('NN load error:', errCodeNN);
               statusEl.textContent = 'NN load error: ' + errCodeNN;
